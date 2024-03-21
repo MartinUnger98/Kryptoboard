@@ -1,3 +1,32 @@
 @import "primeng/resources/themes/lara-dark-teal/theme.css";
 @import "primeng/resources/primeng.css";
 @import "primeicons/primeicons.css";
+
+
+$primary: #00C853;
+$secondary: #323F4B;
+$accent-1: #00B0FF;
+$accent-2: #FF304F;
+
+
+
+
+
+//mixin
+
+@mixin flex-standard($jc: center, $ai: center, $g: 0px, $fd: row) {
+  display: flex;
+  justify-content: $jc;
+  align-items: $ai;
+  gap: $g;
+  flex-direction: $fd;
+}
+
+
+
+//standard classes
+
+.flex-standard {
+  @include flex-standard();
+}
+

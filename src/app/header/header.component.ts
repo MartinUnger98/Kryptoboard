@@ -6,5 +6,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  kryptos = [
+    {
+      img: 'assets/img/bitcoin.svg',
+    },
+    {
+      img: 'assets/img/etherium.svg',
+    },
+  ]
+
+  constructor() {}
 
 }
