@@ -13,6 +13,15 @@ export class HeaderComponent {
     {
       img: 'assets/img/etherium.svg',
     },
+    {
+      img: 'assets/img/bnb.svg',
+    },
+    {
+      img: 'assets/img/solana.svg',
+    },
+    {
+      img: 'assets/img/litecoin.svg',
+    },
   ]
 
   constructor() {}
