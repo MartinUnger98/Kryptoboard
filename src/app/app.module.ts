@@ -8,6 +8,8 @@ import { CarouselModule } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { GraphComponent } from './graph/graph.component';
+import { ChartModule } from 'primeng/chart';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,8 @@ import { GraphComponent } from './graph/graph.component';
     CarouselModule,
     ButtonModule,
     TagModule,
-
+    ChartModule,
+    HttpClientModule,
 
   ],
   providers: [],
