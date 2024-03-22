@@ -24,7 +24,6 @@ export class GraphComponent {
     this.subscribeObservables();
     this.months = this.generateMonthsLastDay(this.startDate);
     await this.loadMonthlyCourse();
-    this.setupChart();
   }
 
 
@@ -36,6 +35,7 @@ export class GraphComponent {
       const data = monthlyCourse[month];
       return data ? data["1a. open (EUR)"] : null;
     });
+    this.setupChart(this.months);
   }
 
 
@@ -46,26 +46,31 @@ export class GraphComponent {
 
     let filteredDailyCourse = [];
 
-    // Konvertiere die Objektschlüssel in ein Array und filtere basierend auf dem Start- und Enddatum
     const dates = Object.keys(dailyCourseData).filter(date => date >= startDate && date <= endDate);
 
     for (const date of dates) {
       const dataForDate = dailyCourseData[date];
-      // Angenommen, du möchtest den Eröffnungskurs für jeden Tag verwenden
       filteredDailyCourse.push({
         date: date,
         open: parseFloat(dataForDate["1a. open (EUR)"])
       });
     }
 
-    // Jetzt kannst du filteredDailyCourse für deine Chart-Daten verwenden
-    this.course = filteredDailyCourse;
+    let courseDays = [];
+    let courseValues = [];
+
+    for (let i = 0; i < filteredDailyCourse.length; i++) {
+      courseDays.push(filteredDailyCourse[i].date);
+      courseValues.push(filteredDailyCourse[i].open);
+    }
+    this.course = courseValues;
+    this.setupChart(courseDays);
   }
 
 
-  setupChart() {
+  setupChart(labels:any) {
     this.data = {
-        labels: this.months.map(month => month.substring(0, 7)), // Extrahiert das Jahr und den Monat
+        labels: labels.map((label: string) => label), // Extrahiert das Jahr und den Monat
         datasets: [
             {
                 label: `${this.currentKrypto} zu EUR`,
