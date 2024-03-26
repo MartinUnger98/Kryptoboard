@@ -8,28 +8,7 @@ import { KryptoService } from '../services/krypto.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  kryptos = [
-    {
-      name: 'BTC',
-      img: 'assets/img/bitcoin.svg',
-    },
-    {
-      name: 'ETH',
-      img: 'assets/img/etherium.svg',
-    },
-    {
-      name: 'BNB',
-      img: 'assets/img/bnb.svg',
-    },
-    {
-      name: 'SOL',
-      img: 'assets/img/solana.svg',
-    },
-    {
-      name: 'LTC',
-      img: 'assets/img/litecoin.svg',
-    },
-  ];
+  kryptos!: any;
 
   private destroyed$ = new Subject<void>();
 
@@ -38,17 +17,23 @@ export class HeaderComponent {
 
 
   ngOnInit() {
+    this.subscribeObservables();
+  }
 
+  subscribeObservables() {
+    this.kryptoService.kryptos$.pipe(takeUntil(this.destroyed$)).subscribe( kryptos => {
+      this.kryptos = kryptos;
+    });
   }
 
   onCarouselPageChange(event: any) {
     const currentKrypto = this.kryptos[event.page];
-    this.setNewKrypto(currentKrypto.name);
+    this.setNewKrypto(currentKrypto.short, currentKrypto.name);
   }
 
 
-  setNewKrypto(newKrypto: string) {
-    this.kryptoService.setCurrentCrypto(newKrypto);
+  setNewKrypto(newKrypto: string, newKryptoName: string) {
+    this.kryptoService.setCurrentCrypto(newKrypto, newKryptoName);
   }
 
 

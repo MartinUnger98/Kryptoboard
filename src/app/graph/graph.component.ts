@@ -15,16 +15,23 @@ import { HttpClient } from '@angular/common/http';
 })
 export class GraphComponent implements OnInit, OnDestroy{
   private destroyed$ = new Subject<void>();
-
-
+  API_KEY: string = "CG-QNdDAkMhcmfZMRXThWCkqhGc";
 
   currentKrypto!: string;
+  currentKryptoName!: string;
 
   data: any;
   course: any = [];
-  btc_coin_gecko!: number;
-  url_coin_gecko: string = "https://api.coingecko.com/api/v3/coins/bitcoin";
-  API_KEY: string = "CG-QNdDAkMhcmfZMRXThWCkqhGc";
+
+  attribute_API_KEY: string = `?x_cg_demo_api_key=${this.API_KEY}`;
+  base_url: string = `https://api.coingecko.com/api/v3/coins/`;
+  standard_currency: string = 'eur';
+  course_days: number = 365;
+
+  current_price!: number;
+  current_url!: string;
+
+
 
 
 
@@ -32,47 +39,43 @@ export class GraphComponent implements OnInit, OnDestroy{
 
   async ngOnInit() {
     this.subscribeObservables();
-    await this.fillBTCcoinGecko();
-    await this.fillBTCPricesLast30Days();
-    this.setupChart();
   }
 
-
-  setupChart() {
-    this.data = {
-        labels: this.course.map((item: PriceDateObject) => item.date.substring(5,10)), // Extrahiert das Jahr und den Monat
-        datasets: [
-            {
-                label: `${this.currentKrypto} zu EUR`,
-                data: this.course.map((item: PriceDateObject) => item.price),
-                fill: false,
-                borderColor: '#00C853',
-                tension: 0.4
-            }
-        ]
-    };
-  }
 
   subscribeObservables() {
     this.kryptoService.currentKrypto$.pipe(takeUntil(this.destroyed$)).subscribe( currentKrypto => {
       this.currentKrypto = currentKrypto;
     });
+
+    this.kryptoService.currentKryptoName$.pipe(takeUntil(this.destroyed$)).subscribe( currentKryptoName => {
+      this.currentKryptoName = currentKryptoName;
+      this.updateCurrentURL();
+      this.updateKryptoData();
+    });
   }
 
 
-  async fillBTCcoinGecko() {
-    let url = this.url_coin_gecko;
-    let response = await firstValueFrom(this.http.get<any>(url));
+  updateCurrentURL() {
+    this.current_url = `https://api.coingecko.com/api/v3/coins/${this.currentKryptoName}` + this.attribute_API_KEY;
+  }
+
+
+  async updateKryptoData() {
+    await this.setCurrentPrice();
+    await this.setDataForChart();
+    this.setupChart();
+  }
+
+
+  async setCurrentPrice() {
+    let response = await firstValueFrom(this.http.get<any>(this.current_url));
     let price = response.market_data.current_price.eur;
-    this.btc_coin_gecko = price;
+    this.current_price = price;
   }
 
 
-  async fillBTCPricesLast30Days(): Promise<PriceDateObject[]> {
-    const baseUrl = 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart';
-    const vsCurrency = 'eur';
-    const days = 365;
-    const url = `${baseUrl}?vs_currency=${vsCurrency}&days=${days}`;
+  async setDataForChart(): Promise<PriceDateObject[]> {
+    const url = `${this.base_url}/${this.currentKryptoName}/market_chart?vs_currency=${this.standard_currency}&days=${this.course_days}${this.attribute_API_KEY}`;
 
     try {
       const response = await fetch(url);
@@ -90,13 +93,28 @@ export class GraphComponent implements OnInit, OnDestroy{
         price: price.toFixed(2),
         date: new Date(timestamp).toISOString().split('T')[0].replace(/-/g, '/')
       }));
-      console.log(pricesLast30Days);
       this.course = pricesLast30Days;
       return pricesLast30Days;
     } catch (error) {
       console.error('Error fetching data from CoinGecko:', error);
       return [];
     }
+  }
+
+
+  setupChart() {
+    this.data = {
+        labels: this.course.map((item: PriceDateObject) => item.date.substring(5,10)), // Extrahiert das Jahr und den Monat
+        datasets: [
+            {
+                label: `${this.currentKrypto} zu EUR`,
+                data: this.course.map((item: PriceDateObject) => item.price),
+                fill: false,
+                borderColor: '#00C853',
+                tension: 0.4
+            }
+        ]
+    };
   }
 
 
