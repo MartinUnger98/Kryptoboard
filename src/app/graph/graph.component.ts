@@ -26,7 +26,7 @@ export class GraphComponent implements OnInit, OnDestroy{
   attribute_API_KEY: string = `?x_cg_demo_api_key=${this.API_KEY}`;
   base_url: string = `https://api.coingecko.com/api/v3/coins/`;
   standard_currency: string = 'eur';
-  course_days: number = 365;
+  course_days: number = 30;
 
   current_price!: number;
   current_url!: string;
@@ -52,6 +52,7 @@ export class GraphComponent implements OnInit, OnDestroy{
       this.updateCurrentURL();
       this.updateKryptoData();
     });
+
   }
 
 
@@ -75,30 +76,40 @@ export class GraphComponent implements OnInit, OnDestroy{
 
 
   async setDataForChart(): Promise<PriceDateObject[]> {
-    const url = `${this.base_url}/${this.currentKryptoName}/market_chart?vs_currency=${this.standard_currency}&days=${this.course_days}${this.attribute_API_KEY}`;
-
+    const url = this.buildUrl();
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      const seenDates = new Set<string>();
-      const pricesLast30Days: PriceDateObject[] = data.prices.filter(([timestamp]: [number, number]) => {
-        const date = new Date(timestamp).toISOString().split('T')[0];
-        if (seenDates.has(date)) {
-          return false;
-        }
-        seenDates.add(date);
-        return true;
-      }).map(([timestamp, price]: [number, number]): PriceDateObject => ({
-        price: price.toFixed(2),
-        date: new Date(timestamp).toISOString().split('T')[0].replace(/-/g, '/')
-      }));
+      const data = await this.fetchData(url);
+      const pricesLast30Days = this.transformChartData(data);
       this.course = pricesLast30Days;
       return pricesLast30Days;
     } catch (error) {
       console.error('Error fetching data from CoinGecko:', error);
       return [];
     }
+  }
+
+  buildUrl(): string {
+    return `${this.base_url}/${this.currentKryptoName}/market_chart?vs_currency=${this.standard_currency}&days=${this.course_days}${this.attribute_API_KEY}`;
+  }
+
+  async fetchData(url: string): Promise<any> {
+    const response = await fetch(url);
+    return response.json();
+  }
+
+  transformChartData(data: any): PriceDateObject[] {
+    const seenDates = new Set<string>();
+    return data.prices.filter(([timestamp]: [number, number]) => {
+      const date = new Date(timestamp).toISOString().split('T')[0];
+      if (seenDates.has(date)) {
+        return false;
+      }
+      seenDates.add(date);
+      return true;
+    }).map(([timestamp, price]: [number, number]): PriceDateObject => ({
+      price: price.toFixed(2),
+      date: new Date(timestamp).toISOString().split('T')[0].replace(/-/g, '/')
+    }));
   }
 
 
@@ -115,6 +126,13 @@ export class GraphComponent implements OnInit, OnDestroy{
             }
         ]
     };
+  }
+
+
+  async changeDays(days: number) {
+    this.course_days = days;
+    await this.setDataForChart();
+    this.setupChart();
   }
 
 
