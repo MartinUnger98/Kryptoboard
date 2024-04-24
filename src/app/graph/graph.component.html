@@ -1,12 +1,21 @@
-<p>{{currentKrypto}}</p>
-<p>Currentprice</p>
-<p>{{current_price}}</p>
+<div class="container-price-info">
+  <p>{{currentKrypto}}</p>
+  <div class="current-price">
+    <p>Current price:</p>
+    <p>{{ current_price | currency:'EUR':'symbol':'1.2-2':'de' }}€</p>
+  </div>
+</div>
+
 
 
 
 <p-chart type="line" [data]="data"></p-chart>
+<div class="btn-row">
+  <p-button class="p-button-success" (click)="changeDays(7)">7 Days</p-button>
+  <p-button class="p-button-success" (click)="changeDays(30)">30 Days</p-button>
+  <p-button class="p-button-success" (click)="changeDays(365)">365 Days</p-button>
 
-<p-button (click)="changeDays(30)">30 Days</p-button>
-<p-button (click)="changeDays(365)">365 Days</p-button>
+</div>
+
 
 

@@ -1,0 +1,11 @@
+<section>
+  <div class="carousel-container">
+    <p-carousel [value]="kryptos" [numVisible]="1" [numScroll]="1" [circular]="false" (onPage)="onCarouselPageChange($event)">
+      <ng-template let-product pTemplate="item">
+        <div class="flex-standard">
+            <img src="{{ product.img }}" [alt]="product.name"/>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+</section>

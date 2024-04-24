@@ -1,0 +1,28 @@
+@import '../../styles.scss';
+
+section {
+  @include flex-standard();
+
+  .carousel-container {
+    width: 50%;
+    @media (max-width: 400px) {
+      width: 235px;
+    }
+  }
+
+  p-carousel {
+    img {
+      max-width: 130px;
+      max-height: 130px;
+      min-width: 50px;
+      min-height: 50px;
+      width: 25%;
+      height: 25%;
+
+    }
+
+
+  }
+}
+
+

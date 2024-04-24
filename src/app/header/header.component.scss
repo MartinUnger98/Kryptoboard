@@ -5,19 +5,7 @@ section {
     width: 200px;
     height: 200px;
     filter: drop-shadow(4px 3px 7px $primary);
-  }
-
-  .carousel-container {
-    width: 235px;
-  }
-
-  p-carousel {
-    img {
-      width: 50px;
-      height: 50px;
-      filter: none;
-    }
-
+    margin: 40px;
   }
 }
 

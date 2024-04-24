@@ -8,6 +8,7 @@ import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { KryptoService } from '../services/krypto.service';
 import { HttpClient } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
@@ -32,13 +33,32 @@ export class GraphComponent implements OnInit, OnDestroy{
   current_url!: string;
 
 
-
-
+  apiCounter: number = 0;
+  actualTime:  Date = new Date();
+  timeToNextMinute = (60 - this.actualTime.getSeconds()) * 1000 - this.actualTime.getMilliseconds();
 
   constructor(private kryptoService: KryptoService, private http: HttpClient) {}
 
+
+
+
   async ngOnInit() {
     this.subscribeObservables();
+    this.resetVariableOnNewMinute();
+  }
+
+
+  resetVariable() {
+    this.apiCounter = 0;
+    console.log(this.apiCounter);
+  }
+
+
+  resetVariableOnNewMinute() {
+    setTimeout(() => {
+      this.resetVariable();
+      setInterval(() => this.resetVariable(), 60000);
+    }, this.timeToNextMinute);
   }
 
 
@@ -83,6 +103,7 @@ export class GraphComponent implements OnInit, OnDestroy{
       this.course = pricesLast30Days;
       return pricesLast30Days;
     } catch (error) {
+      //here show  error message or something like that
       console.error('Error fetching data from CoinGecko:', error);
       return [];
     }
